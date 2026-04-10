@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String       @id @default(cuid())
+  name          String
+  email         String       @unique
+  password      String
+  role          Role         @default(CITIZEN)
+  phone         String?
+  city          String?
+  badgeNumber   String?      @unique
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  complaints    Complaint[]  @relation("UserComplaints")
+  assignedCases Case[]       @relation("OfficerCases")
+  sessions      Session[]
+  accounts      Account[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Complaint {
+  id            String        @id @default(cuid())
+  firNumber     String        @unique
+  complainantId String
+  complainant   User          @relation("UserComplaints", fields: [complainantId], references: [id])
+  crimeType     CrimeType
+  description   String        @db.Text
+  incidentDate  DateTime
+  city          String
+  financialLoss Float         @default(0)
+  status        Status        @default(OPEN)
+  priority      Priority      @default(MEDIUM)
+  aiAnalysis    String?       @db.Text
+  aiConfidence  Float?
+  case          Case?
+  evidence      Evidence[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Case {
+  id           String      @id @default(cuid())
+  caseNumber   String      @unique
+  complaintId  String      @unique
+  complaint    Complaint   @relation(fields: [complaintId], references: [id])
+  officerId    String?
+  officer      User?       @relation("OfficerCases", fields: [officerId], references: [id])
+  status       Status      @default(OPEN)
+  priority     Priority    @default(MEDIUM)
+  notes        String?     @db.Text
+  closedAt     DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  logs         CaseLog[]
+}
+
+model CaseLog {
+  id        String   @id @default(cuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id])
+  action    String
+  details   String?  @db.Text
+  createdAt DateTime @default(now())
+}
+
+model Evidence {
+  id          String    @id @default(cuid())
+  complaintId String
+  complaint   Complaint @relation(fields: [complaintId], references: [id])
+  type        String
+  description String    @db.Text
+  fileUrl     String?
+  hash        String?
+  verified    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+}
+
+enum Role {
+  ADMIN
+  OFFICER
+  CITIZEN
+}
+
+enum Status {
+  OPEN
+  ACTIVE
+  CLOSED
+  DISMISSED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum CrimeType {
+  PHISHING
+  RANSOMWARE
+  IDENTITY_THEFT
+  BANKING_FRAUD
+  CYBERBULLYING
+  DATA_BREACH
+  HACKING
+  SOCIAL_MEDIA_FRAUD
+  DARK_WEB
+  OTHER
+}
