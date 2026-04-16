@@ -1,100 +1,256 @@
 'use client';
+
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { FiMail, FiLock, FiShield, FiArrowRight, FiEye, FiEyeOff, FiUser, FiBriefcase, FiShield as FiAdmin } from 'react-icons/fi';
+import toast from 'react-hot-toast';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [tab, setTab] = useState<'admin'|'officer'|'citizen'>('citizen');
+  const [showPassword, setShowPassword] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('citizen');
 
-  const demoCredentials = {
-    admin:   { email: 'admin@acms.gov.in',  password: 'admin123' },
-    officer: { email: 'mehta@acms.gov.in',  password: 'officer123' },
-    citizen: { email: 'rahul@example.com',  password: 'citizen123' },
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      toast.error('Please enter email and password');
+      return;
+    }
+    
     setLoading(true);
-    setError('');
-    const res = await signIn('credentials', { ...form, redirect: false });
-    setLoading(false);
-    if (res?.error) setError('Invalid email or password');
-    else router.push('/dashboard');
+    try {
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error(result.error || 'Invalid credentials');
+      } else {
+        toast.success('Welcome to CyberGuard AI!');
+        router.push('/dashboard');
+        router.refresh();
+      }
+    } catch (err) {
+      toast.error('Something went wrong');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const fillDemo = () => setForm(demoCredentials[tab]);
+  const quickLogin = async (email: string, pass: string) => {
+    setLoading(true);
+    const result = await signIn('credentials', {
+      email,
+      password: pass,
+      redirect: false,
+    });
+    if (!result?.error) {
+      toast.success('Login successful!');
+      router.push('/dashboard');
+      router.refresh();
+    } else {
+      toast.error('Login failed');
+    }
+    setLoading(false);
+  };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', padding: '20px' }}>
-      <div style={{ width: '100%', maxWidth: '380px' }}>
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ width: '56px', height: '56px', background: 'var(--accent)', borderRadius: '12px', margin: '0 auto 12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="#050A14">
-              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
-            </svg>
-          </div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text)' }}>ACMS Portal</div>
-          <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '4px' }}>AI Cyber Crime Management System</div>
-        </div>
-
-        {/* Card */}
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '28px' }}>
-          {/* Role Tabs */}
-          <div style={{ display: 'flex', background: 'var(--surface2)', borderRadius: '8px', padding: '3px', marginBottom: '24px', gap: '2px' }}>
-            {(['citizen','officer','admin'] as const).map(r => (
-              <button key={r} onClick={() => setTab(r)} style={{ flex: 1, padding: '7px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontFamily: 'Syne, sans-serif', fontWeight: tab === r ? 700 : 400, background: tab === r ? 'var(--surface)' : 'transparent', color: tab === r ? 'var(--text)' : 'var(--muted)', textTransform: 'capitalize' }}>
-                {r}
-              </button>
-            ))}
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: '14px' }}>
-              <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>Email</label>
-              <input type="email" required value={form.email} onChange={e => setForm(p => ({...p, email: e.target.value}))}
-                placeholder="your@email.com"
-                style={{ width: '100%', background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 12px', color: 'var(--text)', fontSize: '13px', fontFamily: 'Syne, sans-serif', outline: 'none' }}
-              />
+    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-blue-50 via-white to-blue-50">
+      <div className="w-full max-w-6xl">
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+          <div className="flex flex-col lg:flex-row">
+            
+            {/* Left Side - Branding */}
+            <div className="lg:w-2/5 bg-gradient-to-br from-blue-700 to-blue-500 p-8 lg:p-12 text-white">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+                  <FiShield className="text-white text-2xl" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold tracking-tight">CyberGuard <span className="text-blue-200">AI</span></h1>
+                  <p className="text-xs text-blue-200 opacity-80">AI-Powered Cyber Crime Management</p>
+                </div>
+              </div>
+              
+              <div className="space-y-6 mt-12">
+                <h2 className="text-3xl font-bold">Welcome Back</h2>
+                <p className="text-blue-100 leading-relaxed">
+                  India's first AI-powered cyber crime complaint management system. 
+                  File complaints, track cases, and get AI-assisted analysis in real-time.
+                </p>
+                
+                <div className="space-y-3 mt-8">
+                  <div className="flex items-center gap-3 text-sm text-blue-100">
+                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">✓</div>
+                    <span>AI-powered crime classification</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-blue-100">
+                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">✓</div>
+                    <span>Real-time case tracking</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-blue-100">
+                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">✓</div>
+                    <span>Secure evidence upload</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-blue-100">
+                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">✓</div>
+                    <span>24/7 complaint filing</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-12 pt-8 border-t border-white/20">
+                <p className="text-xs text-blue-200">
+                  🔒 Protected by advanced encryption • Made in India
+                </p>
+              </div>
             </div>
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>Password</label>
-              <input type="password" required value={form.password} onChange={e => setForm(p => ({...p, password: e.target.value}))}
-                placeholder="••••••••"
-                style={{ width: '100%', background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 12px', color: 'var(--text)', fontSize: '13px', fontFamily: 'Syne, sans-serif', outline: 'none' }}
-              />
-            </div>
+            
+            {/* Right Side - Login Form */}
+            <div className="lg:w-3/5 p-8 lg:p-12 bg-white">
+              <div className="max-w-md mx-auto w-full">
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-bold text-gray-800">Sign In</h2>
+                  <p className="text-gray-500 text-sm mt-1">Access your CyberGuard AI account</p>
+                </div>
 
-            {error && <div style={{ background: 'rgba(255,77,109,0.1)', border: '1px solid rgba(255,77,109,0.3)', color: 'var(--danger)', padding: '10px 12px', borderRadius: '6px', fontSize: '12px', marginBottom: '16px' }}>{error}</div>}
+                {/* Role Selector */}
+                <div className="flex gap-3 mb-8">
+                  <button
+                    onClick={() => setSelectedRole('citizen')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
+                      selectedRole === 'citizen' 
+                        ? 'bg-blue-50 border-blue-500 text-blue-600' 
+                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                    }`}
+                  >
+                    <FiUser className="text-base" />
+                    <span className="text-sm font-medium">Citizen</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedRole('officer')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
+                      selectedRole === 'officer' 
+                        ? 'bg-blue-50 border-blue-500 text-blue-600' 
+                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                    }`}
+                  >
+                    <FiBriefcase className="text-base" />
+                    <span className="text-sm font-medium">Officer</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedRole('admin')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
+                      selectedRole === 'admin' 
+                        ? 'bg-blue-50 border-blue-500 text-blue-600' 
+                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                    }`}
+                  >
+                    <FiAdmin className="text-base" />
+                    <span className="text-sm font-medium">Admin</span>
+                  </button>
+                </div>
 
-            <button type="submit" disabled={loading} style={{ width: '100%', background: 'var(--accent)', color: 'var(--bg)', border: 'none', padding: '11px', borderRadius: '6px', fontSize: '14px', fontWeight: 700, fontFamily: 'Syne, sans-serif', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>
-              {loading ? 'Signing in...' : 'Sign In'}
-            </button>
-          </form>
+                <form onSubmit={handleLogin} className="space-y-5">
+                  {/* Email */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <div className="relative">
+                      <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder={selectedRole === 'citizen' ? 'rahul@example.com' : selectedRole === 'officer' ? 'mehta@acms.gov.in' : 'admin@acms.gov.in'}
+                        className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all outline-none"
+                      />
+                    </div>
+                  </div>
 
-          <button onClick={fillDemo} style={{ width: '100%', marginTop: '12px', background: 'transparent', border: '1px solid var(--border)', color: 'var(--muted)', padding: '9px', borderRadius: '6px', fontSize: '12px', fontFamily: 'Syne, sans-serif', cursor: 'pointer' }}>
-            Fill Demo Credentials ({tab})
-          </button>
+                  {/* Password */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <div className="relative">
+                      <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter your password"
+                        className="w-full pl-12 pr-12 py-3 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <FiEyeOff /> : <FiEye />}
+                      </button>
+                    </div>
+                  </div>
 
-          <div style={{ marginTop: '20px', padding: '12px', background: 'var(--surface2)', borderRadius: '8px' }}>
-            <div style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Demo Accounts</div>
-            <div style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.8, fontFamily: 'DM Mono, monospace' }}>
-              admin@acms.gov.in / admin123<br/>
-              mehta@acms.gov.in / officer123<br/>
-              rahul@example.com / citizen123
+                  {/* Sign In Button */}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold py-3 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-60 flex items-center justify-center gap-2"
+                  >
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        Sign In <FiArrowRight />
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                {/* Demo Accounts */}
+                <div className="mt-8">
+                  <p className="text-xs text-center text-gray-400 mb-3">Quick Demo Access</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      onClick={() => quickLogin('admin@acms.gov.in', 'admin123')}
+                      className="py-2 text-xs font-medium rounded-lg bg-gray-50 border border-gray-200 text-gray-700 hover:bg-blue-50 hover:border-blue-200 transition-all"
+                    >
+                      👑 Admin
+                    </button>
+                    <button
+                      onClick={() => quickLogin('mehta@acms.gov.in', 'officer123')}
+                      className="py-2 text-xs font-medium rounded-lg bg-gray-50 border border-gray-200 text-gray-700 hover:bg-blue-50 hover:border-blue-200 transition-all"
+                    >
+                      👮 Officer
+                    </button>
+                    <button
+                      onClick={() => quickLogin('rahul@example.com', 'citizen123')}
+                      className="py-2 text-xs font-medium rounded-lg bg-gray-50 border border-gray-200 text-gray-700 hover:bg-blue-50 hover:border-blue-200 transition-all"
+                    >
+                      👤 Citizen
+                    </button>
+                  </div>
+                </div>
+
+                {/* Footer Link */}
+                <div className="mt-6 text-center">
+                  <a href="/complaints/new" className="text-xs text-blue-500 hover:text-blue-600 transition-colors">
+                    🔍 File a complaint without login
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
-        <div style={{ textAlign: 'center', marginTop: '20px' }}>
-          <a href="/complaints/new" style={{ fontSize: '12px', color: 'var(--accent)', textDecoration: 'none' }}>
-            File a complaint without login →
-          </a>
-        </div>
+        
+        {/* Footer */}
+        <p className="text-center text-xs text-gray-400 mt-6">
+          © 2025 CyberGuard AI. All rights reserved. | Protected by Indian Cyber Laws
+        </p>
       </div>
     </div>
   );
