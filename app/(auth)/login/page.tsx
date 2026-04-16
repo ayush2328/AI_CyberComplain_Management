@@ -3,7 +3,16 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { FiMail, FiLock, FiShield, FiArrowRight, FiEye, FiEyeOff, FiUser, FiBriefcase, FiShield as FiAdmin } from 'react-icons/fi';
+import { 
+  FiMail, 
+  FiLock, 
+  FiShield, 
+  FiArrowRight, 
+  FiEye, 
+  FiEyeOff, 
+  FiUser, 
+  FiBriefcase 
+} from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
@@ -152,7 +161,7 @@ export default function LoginPage() {
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}
                   >
-                    <FiAdmin className="text-base" />
+                    <FiShield className="text-base" />
                     <span className="text-sm font-medium">Admin</span>
                   </button>
                 </div>
