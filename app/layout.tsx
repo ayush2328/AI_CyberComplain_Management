@@ -3,8 +3,8 @@ import './globals.css';
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: 'ACMS — AI Cyber Crime Management System',
-  description: 'AI-powered cyber crime management portal for law enforcement',
+  title: 'CyberGuard AI | AI-Powered Cyber Crime Management',
+  description: 'Next-generation cyber crime complaint management system with AI-powered classification and real-time tracking.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

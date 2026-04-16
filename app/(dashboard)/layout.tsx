@@ -1,16 +1,21 @@
 'use client';
+
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { useEffect } from 'react';
+import { 
+  FiHome, FiFileText, FiPlus, FiFolder, FiCpu, 
+  FiUsers, FiBarChart2, FiLogOut, FiBell, FiShield
+} from 'react-icons/fi';
 
 const navItems = [
-  { href: '/dashboard',          label: 'Dashboard',      section: 'Overview',    icon: 'M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z' },
-  { href: '/complaints/new',     label: 'File Complaint', section: 'Complaints',  icon: 'M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z', badge: '+' },
-  { href: '/complaints',         label: 'All Complaints', section: null,          icon: 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z' },
-  { href: '/cases',              label: 'Cases',          section: 'Intelligence',icon: 'M20 6h-2.18c.07-.44.18-.88.18-1.36C18 2.51 16.48 1 14.63 1c-1.22 0-2.1.71-2.77 1.75L12 3.5l-.86-1.74C10.48 1.71 9.6 1 8.38 1 6.52 1 5 2.51 5 4.64c0 .48.11.92.18 1.36H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z' },
-  { href: '/ai',                 label: 'AI Prediction',  section: null,          icon: 'M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z' },
-  { href: '/officers',           label: 'Officers',       section: 'Admin',       icon: 'M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3z' },
-  { href: '/reports',            label: 'Reports',        section: null,          icon: 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z' },
+  { href: '/dashboard', label: 'Dashboard', icon: FiHome },
+  { href: '/complaints/new', label: 'File Complaint', icon: FiPlus, badge: '+' },
+  { href: '/complaints', label: 'All Complaints', icon: FiFileText },
+  { href: '/cases', label: 'Cases', icon: FiFolder },
+  { href: '/ai', label: 'AI Prediction', icon: FiCpu },
+  { href: '/officers', label: 'Officers', icon: FiUsers },
+  { href: '/reports', label: 'Reports', icon: FiBarChart2 },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -23,73 +28,104 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [status, router]);
 
   if (status === 'loading') return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
-      <div style={{ color: 'var(--accent)', fontSize: '14px' }}>Loading...</div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-blue-600 text-sm">Loading...</div>
     </div>
   );
 
   const user = session?.user as any;
   const initials = user?.name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || 'U';
 
-  let lastSection = '';
-
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       {/* Sidebar */}
-      <div style={{ width: '220px', background: 'var(--surface)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-        <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid var(--border)' }}>
-          <div style={{ width: '32px', height: '32px', background: 'var(--accent)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#050A14"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+      <div className="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 shadow-sm">
+        {/* Logo */}
+        <div className="p-5 border-b border-gray-100">
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center shadow-md">
+              <FiShield className="text-white text-lg" />
+            </div>
+            <div>
+              <h1 className="font-bold text-gray-800 text-lg tracking-tight">CyberGuard <span className="text-blue-600">AI</span></h1>
+              <p className="text-[10px] text-gray-400 -mt-0.5">Cyber Crime Management</p>
+            </div>
           </div>
-          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text)' }}>ACMS</div>
-          <div style={{ fontSize: '10px', color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Cyber Crime Portal</div>
         </div>
 
-        <nav style={{ flex: 1, padding: '12px 0', overflowY: 'auto' }}>
+        {/* Navigation */}
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
-            const showSection = item.section && item.section !== lastSection;
-            if (item.section) lastSection = item.section;
             const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
             return (
-              <div key={item.href}>
-                {showSection && <div style={{ padding: '8px 16px 4px', fontSize: '9px', color: 'var(--muted)', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 500 }}>{item.section}</div>}
-                <div onClick={() => router.push(item.href)}
-                  style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 16px', cursor: 'pointer', fontSize: '13px', color: active ? 'var(--accent)' : 'var(--muted)', borderLeft: `2px solid ${active ? 'var(--accent)' : 'transparent'}`, background: active ? 'rgba(0,229,255,0.05)' : 'transparent', transition: 'all 0.15s', margin: '1px 0' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={item.icon}/></svg>
-                  {item.label}
-                  {item.badge && <span style={{ marginLeft: 'auto', background: 'var(--accent2)', color: '#fff', fontSize: '9px', padding: '2px 6px', borderRadius: '10px' }}>{item.badge}</span>}
-                </div>
-              </div>
+              <button
+                key={item.href}
+                onClick={() => router.push(item.href)}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all ${
+                  active 
+                    ? 'bg-blue-50 text-blue-600 font-medium shadow-sm' 
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                }`}
+              >
+                <item.icon className="text-lg" />
+                {item.label}
+                {item.badge && (
+                  <span className="ml-auto bg-blue-500 text-white text-[10px] px-2 py-0.5 rounded-full">
+                    {item.badge}
+                  </span>
+                )}
+              </button>
             );
           })}
         </nav>
 
-        <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--accent3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700, color: '#fff' }}>{initials}</div>
-            <div>
-              <div style={{ fontSize: '12px', color: 'var(--text)' }}>{user?.name || 'User'}</div>
-              <div style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'capitalize' }}>{user?.role?.toLowerCase() || 'citizen'}</div>
+        {/* User Section */}
+        <div className="p-4 border-t border-gray-100 bg-white">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+              {initials}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-800 truncate">{user?.name || 'User'}</p>
+              <p className="text-xs text-gray-400 truncate capitalize">{user?.role?.toLowerCase() || 'citizen'}</p>
             </div>
           </div>
-          <button onClick={() => signOut({ callbackUrl: '/login' })} style={{ width: '100%', background: 'transparent', border: '1px solid var(--border)', color: 'var(--muted)', padding: '6px', borderRadius: '6px', fontSize: '11px', fontFamily: 'Syne, sans-serif', cursor: 'pointer' }}>
+          <button
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all"
+          >
+            <FiLogOut className="text-base" />
             Sign Out
           </button>
         </div>
       </div>
 
-      {/* Main */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <div style={{ height: '52px', background: 'var(--surface)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', padding: '0 20px', gap: '12px', flexShrink: 0 }}>
-          <div style={{ flex: 1, fontSize: '15px', fontWeight: 700 }}>
-            {navItems.find(n => pathname === n.href || (n.href !== '/dashboard' && pathname.startsWith(n.href)))?.label || 'Dashboard'}
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Bar */}
+        <div className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0 shadow-sm">
+          <div>
+            <h2 className="text-base font-semibold text-gray-800">
+              {navItems.find(n => pathname === n.href || (n.href !== '/dashboard' && pathname.startsWith(n.href)))?.label || 'Dashboard'}
+            </h2>
+            <p className="text-xs text-gray-400 hidden sm:block">Manage and track cyber crime complaints</p>
           </div>
-          <div style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid rgba(0,229,255,0.3)', color: 'var(--accent)', fontSize: '10px', padding: '3px 8px', borderRadius: '4px', fontFamily: 'DM Mono, monospace' }}>● LIVE</div>
-          <button onClick={() => router.push('/complaints/new')} style={{ background: 'var(--accent)', color: 'var(--bg)', border: 'none', padding: '7px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 700, fontFamily: 'Syne, sans-serif', cursor: 'pointer' }}>
-            + File Complaint
-          </button>
+          <div className="flex items-center gap-4">
+            <button className="relative p-2 rounded-lg hover:bg-gray-100 transition-all">
+              <FiBell className="text-gray-500 text-lg" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <button
+              onClick={() => router.push('/complaints/new')}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-sm"
+            >
+              + File Complaint
+            </button>
+          </div>
         </div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+
+        {/* Page Content */}
+        <div className="flex-1 overflow-y-auto p-6">
           {children}
         </div>
       </div>
