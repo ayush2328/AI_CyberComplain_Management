@@ -1,44 +1,47 @@
-# AI Cyber Crime Management System (ACMS)
+````markdown
+# 🛡️ ACMS — AI Cyber Crime Management System
 
-Full-stack web app — Next.js 14 + Railway MySQL + Claude AI + Vercel
+> Full-stack government cyber crime portal built with Next.js 14, Railway MySQL, Anthropic Claude AI, and Vercel.
 
 ---
 
-## 🚀 SETUP GUIDE (Step by Step)
+## 🚀 Tech Stack
 
-### STEP 1 — Install dependencies
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js 14 (App Router) |
+| Backend | Next.js API Routes |
+| Database | MySQL on Railway |
+| ORM | Prisma |
+| Auth | NextAuth.js (JWT) |
+| AI | Anthropic Claude API |
+| Hosting | Vercel |
+| Styles | Tailwind CSS |
 
+---
+
+## ⚙️ Setup Guide
+
+### 1. Install Dependencies
 ```bash
 npm install
 ```
 
----
-
-### STEP 2 — Setup Railway MySQL Database (FREE)
-
-1. Go to https://railway.app and sign up (free)
+### 2. Setup Railway MySQL (Free)
+1. Go to [railway.app](https://railway.app) → sign up
 2. Click **New Project → Deploy MySQL**
-3. Wait for it to start, then click your MySQL service
-4. Go to **Connect** tab → copy the **MySQL URL** (looks like: `mysql://root:password@host:port/railway`)
+3. Go to **Connect** tab → copy the **MySQL URL**
 
----
+### 3. Get Anthropic API Key
+1. Go to [console.anthropic.com](https://console.anthropic.com)
+2. **API Keys → Create Key** → copy it
 
-### STEP 3 — Get Anthropic API Key
-
-1. Go to https://console.anthropic.com
-2. Create an account → Go to **API Keys**
-3. Click **Create Key** → copy it
-
----
-
-### STEP 4 — Configure Environment Variables
-
+### 4. Configure Environment Variables
 ```bash
 cp .env.example .env
 ```
 
-Now open `.env` and fill in:
-
+Fill in your `.env`:
 ```env
 DATABASE_URL="mysql://root:YOUR_PASSWORD@YOUR_HOST:PORT/railway"
 NEXTAUTH_SECRET="any-random-string-min-32-chars"
@@ -46,66 +49,51 @@ NEXTAUTH_URL="http://localhost:3000"
 ANTHROPIC_API_KEY="sk-ant-your-key-here"
 ```
 
-To generate NEXTAUTH_SECRET quickly:
-```bash
-openssl rand -base64 32
-```
+> Generate `NEXTAUTH_SECRET`:
+> ```bash
+> openssl rand -base64 32
+> ```
 
----
-
-### STEP 5 — Push Database Schema & Seed Data
-
+### 5. Push Schema & Seed Data
 ```bash
 npm run db:push    # Creates all tables in Railway MySQL
 npm run db:seed    # Adds demo admin, officers, and sample complaints
 ```
 
----
-
-### STEP 6 — Run Locally
-
+### 6. Run Locally
 ```bash
 npm run dev
 ```
-
-Open http://localhost:3000
-
----
-
-## 🔑 Demo Login Credentials
-
-| Role    | Email                  | Password    |
-|---------|------------------------|-------------|
-| Admin   | admin@acms.gov.in      | admin123    |
-| Officer | mehta@acms.gov.in      | officer123  |
-| Citizen | rahul@example.com      | citizen123  |
+Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🌐 Deploy to Vercel (FREE)
+## 🔑 Demo Credentials
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@acms.gov.in | admin123 |
+| Officer | mehta@acms.gov.in | officer123 |
+| Citizen | rahul@example.com | citizen123 |
+
+---
+
+## 🌐 Deploy to Vercel
 
 ### Option A — Vercel CLI
-
 ```bash
 npm install -g vercel
 vercel
 ```
 
-Follow prompts. When asked about environment variables, add them one by one.
-
 ### Option B — Vercel Dashboard
-
-1. Push your project to GitHub
-2. Go to https://vercel.com → **New Project**
-3. Import your GitHub repo
-4. Go to **Settings → Environment Variables** and add:
-   - `DATABASE_URL` → your Railway MySQL URL
-   - `NEXTAUTH_SECRET` → your secret
-   - `NEXTAUTH_URL` → your Vercel URL (e.g. https://acms.vercel.app)
-   - `ANTHROPIC_API_KEY` → your Claude API key
+1. Push project to GitHub
+2. Go to [vercel.com](https://vercel.com) → **New Project**
+3. Import your repo
+4. **Settings → Environment Variables** → add all 4 keys
 5. Click **Deploy**
 
-> ✅ After deploy, update `NEXTAUTH_URL` in Vercel env vars to your actual Vercel domain.
+> ✅ After deploy, update `NEXTAUTH_URL` to your actual Vercel domain (e.g. `https://acms.vercel.app`)
 
 ---
 
@@ -120,7 +108,7 @@ acms/
 │   │   ├── dashboard/         # Main dashboard with stats
 │   │   ├── complaints/        # File complaint + list complaints
 │   │   ├── cases/             # Case management
-│   │   ├── ai/                # AI crime prediction
+│   │   ├── ai/                # AI crime prediction (Claude)
 │   │   ├── officers/          # Officer management
 │   │   └── reports/           # Analytics & reports
 │   └── api/
@@ -132,7 +120,7 @@ acms/
 ├── lib/
 │   ├── prisma.ts              # DB client
 │   ├── auth.ts                # NextAuth config
-│   └── utils.ts               # Helpers
+│   └── utils.ts               # Helpers (FIR gen, colors)
 ├── prisma/
 │   ├── schema.prisma          # Database schema (MySQL)
 │   └── seed.js                # Demo data seeder
@@ -141,22 +129,7 @@ acms/
 
 ---
 
-## 🛠️ Tech Stack
-
-| Layer     | Technology                    |
-|-----------|-------------------------------|
-| Frontend  | Next.js 14 (App Router)       |
-| Backend   | Next.js API Routes            |
-| Database  | MySQL on Railway              |
-| ORM       | Prisma                        |
-| Auth      | NextAuth.js (JWT)             |
-| AI        | Anthropic Claude API          |
-| Hosting   | Vercel (frontend + API)       |
-| Styles    | Tailwind CSS + CSS Variables  |
-
----
-
-## 🔧 Available Scripts
+## 🛠️ Available Scripts
 
 ```bash
 npm run dev          # Start development server
@@ -171,12 +144,32 @@ npm run db:seed      # Seed demo data
 
 ## 👥 Roles & Permissions
 
-| Feature              | Admin | Officer | Citizen |
-|----------------------|-------|---------|---------|
-| View all complaints  | ✅    | ✅      | Own only|
-| File complaint       | ✅    | ✅      | ✅      |
-| Manage cases         | ✅    | ✅      | ❌      |
-| Assign officers      | ✅    | ❌      | ❌      |
-| View officers page   | ✅    | ✅      | ❌      |
-| AI prediction        | ✅    | ✅      | ✅      |
-| Reports              | ✅    | ✅      | ❌      |
+| Feature | Admin | Officer | Citizen |
+|---------|-------|---------|---------|
+| View all complaints | ✅ | ✅ | Own only |
+| File complaint | ✅ | ✅ | ✅ |
+| Manage cases | ✅ | ✅ | ❌ |
+| Assign officers | ✅ | ❌ | ❌ |
+| View officers page | ✅ | ✅ | ❌ |
+| AI prediction | ✅ | ✅ | ✅ |
+| Reports & Analytics | ✅ | ✅ | ❌ |
+
+---
+
+## ✨ Features
+
+- **Complaint Management** — File complaints with auto-generated FIR numbers, track status, filter by category/priority
+- **Case Management** — Create cases from complaints, assign officers, add investigation notes
+- **AI Analysis** — Claude AI gives severity assessment, investigation steps, relevant IT Act / IPC sections, and prevention tips
+- **Reports** — Crime category breakdown, status distribution, officer workload
+- **Role-Based Access** — Admin / Officer / Citizen with separate views and permissions
+- **JWT Auth** — Secure login via NextAuth.js with session management
+
+---
+
+## 📄 License
+
+Academic project — SRM Institute of Science and Technology
+````
+
+Bas iska naam `README.md` rakho aur root folder mein daalo. GitHub pe automatically render ho jayega with all tables, code blocks, badges sab kuch. 🔥
